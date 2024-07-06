@@ -1,0 +1,27 @@
+version: 0.2
+
+env:
+  variables:
+    BUCKET_S3: "web.demo.aws.io"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "Instalando Dependencias NPM...."
+      - npm install
+  build:
+    commands:
+      - echo "Contruyendo el proyecto... $(date)"
+      - npm run build
+      - echo "Contrucción completada... $(date)"
+  post_build:
+    commands:
+      - echo "Subiendo archivos a S3..."
+      - aws s3 cp ./build s3://$BUCKET_S3 --recursive
+      - echo "Archivos subidos a S3... $(date)"
+  artifacts:
+    files:
+      - "**/*"
+  discard-paths: no
