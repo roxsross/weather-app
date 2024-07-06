@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    BUCKET_S3: "web.demo.aws.io"
+    BUCKET_S3: "web2.demo.aws.io"
 
 phases:
   install:
@@ -16,12 +16,7 @@ phases:
       - echo "Contruyendo el proyecto... $(date)"
       - npm run build
       - echo "Contrucción completada... $(date)"
-  post_build:
-    commands:
-      - echo "Subiendo archivos a S3..."
-      - aws s3 cp ./build s3://$BUCKET_S3 --recursive
-      - echo "Archivos subidos a S3... $(date)"
 artifacts:
   files:
     - "**/*"
-discard-paths: no
+  base-directory: 'build'
