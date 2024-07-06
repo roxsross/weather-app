@@ -4,22 +4,23 @@ env:
   variables:
     IMAGEN_REPO_NAME: "weather-app"
     IMAGE_TAG: "latest"
-    AWS_ACCOUNT_ID: "044500828752"
 
 phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
+      - AWS_ACCOUNT_ID=(aws sts get-caller-identity --query Account --output text)
+      - echo "La cuenta es $AWS_ACCOUNT_ID y la region es $AWS_DEFAULT_REGION"
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...  
       - docker build -t $IMAGEN_REPO_NAME:$IMAGE_TAG .
-      - docker tag $IMAGEN_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGEN_REPO_NAME:$IMAGE_TAG      
+      - docker tag $IMAGEN_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGEN_REPO_NAME:$IMAGE_TAG      
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGEN_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGEN_REPO_NAME:$IMAGE_TAG
   
