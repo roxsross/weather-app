@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  variables:
+    BUCKET_S3: "web2.demo.aws.io"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "Instalando Dependencias NPM...."
+      - npm install
+  build:
+    commands:
+      - echo "Contruyendo el proyecto... $(date)"
+      - npm run build
+      - echo "Contrucción completada... $(date)"
+artifacts:
+  files:
+    - "**/*"
+  base-directory: 'build'
