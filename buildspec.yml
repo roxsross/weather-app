@@ -2,22 +2,24 @@ version: 0.2
 
 env:
   variables:
-    BUCKET_S3: "web2.demo.aws.io"
+    IMAGEN_REPO_NAME: "weather-app"
+    IMAGE_TAG: "latest"
+    AWS_ACCOUNT_ID: "044500828752"
 
 phases:
-  install:
-    runtime-versions:
-      nodejs: 18
+  pre_build:
     commands:
-      - echo "Instalando Dependencias NPM...."
-      - npm install
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
-      - echo "Contruyendo el proyecto... $(date)"
-      #- npm run build
-      - npm run hola
-      - echo "Contrucción completada... $(date)"
-artifacts:
-  files:
-    - "**/*"
-  base-directory: 'build'
+      - echo Build started on `date`
+      - echo Building the Docker image...  
+      - docker build -t $IMAGEN_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGEN_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGEN_REPO_NAME:$IMAGE_TAG      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/$IMAGEN_REPO_NAME:$IMAGE_TAG
+  
