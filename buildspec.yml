@@ -14,7 +14,8 @@ phases:
   build:
     commands:
       - echo "Contruyendo el proyecto... $(date)"
-      - npm run build
+      #- npm run build
+      - npm run hola
       - echo "Contrucción completada... $(date)"
 artifacts:
   files:
